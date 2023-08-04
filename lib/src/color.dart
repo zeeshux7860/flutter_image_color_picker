@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
@@ -10,14 +11,13 @@ class ColorDetection {
   final StreamController<Color> stateController;
   final GlobalKey paintKey;
 
-  img.Image photo;
-  // const ColorDetection({Key key, this.title}) super(key: key);
+  img.Image? photo;
 
   ColorDetection({
-    Key key,
-    this.currentKey,
-    this.stateController,
-    this.paintKey,
+    Key? key,
+   required this.currentKey,
+   required this.stateController,
+  required this.paintKey,
   });
 
   Future<dynamic> searchPixel(Offset globalPosition) async {
@@ -28,39 +28,31 @@ class ColorDetection {
   }
 
   _calculatePixel(Offset globalPosition) {
-    RenderBox box = currentKey.currentContext.findRenderObject();
+    final box = currentKey.currentContext!.findRenderObject() as RenderBox;
     Offset localPosition = box.globalToLocal(globalPosition);
 
     double px = localPosition.dx;
     double py = localPosition.dy;
-
-    if (!true) {
-      double widgetScale = box.size.width / photo.width;
-      print(py);
-      px = (px / widgetScale);
-      py = (py / widgetScale);
-    }
-
-    int pixel32 = photo.getPixelSafe(px.toInt(), py.toInt());
-    int hex = abgrToArgb(pixel32);
-
-    stateController.add(Color(hex));
-    return Color(hex);
+   final pixel32 = photo!.getPixelSafe(px.toInt(), py.toInt());
+    final color = Color.fromARGB(pixel32.a.toInt(), pixel32.r.toInt(), pixel32.g.toInt(), pixel32.b.toInt());
+    stateController.add(color);
+    return color;
   }
+  
 
   Future<void> loadSnapshotBytes() async {
-    RenderRepaintBoundary boxPaint = paintKey.currentContext.findRenderObject();
+    RenderRepaintBoundary boxPaint = paintKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
     ui.Image capture = await boxPaint.toImage();
-    ByteData imageBytes =
+    ByteData? imageBytes =
         await capture.toByteData(format: ui.ImageByteFormat.png);
-    setImageBytes(imageBytes);
+    if (imageBytes != null) setImageBytes(imageBytes);
     capture.dispose();
   }
 
   void setImageBytes(ByteData imageBytes) {
     List<int> values = imageBytes.buffer.asUint8List();
     photo = null;
-    photo = img.decodeImage(values);
+    photo = img.decodeImage(Uint8List.fromList(values));
   }
 }
 

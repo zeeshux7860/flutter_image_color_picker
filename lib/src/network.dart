@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-
 import 'dart:async';
-
-import 'package:flutter/rendering.dart';
 import 'package:image_color_picker/src/color.dart';
 
 class NetworkImageBG extends StatefulWidget {
   final String networkpath;
 
-  const NetworkImageBG({Key key, this.networkpath}) : super(key: key);
+  const NetworkImageBG({Key? key, required this.networkpath}) : super(key: key);
   @override
   _NetworkImageBGState createState() => _NetworkImageBGState();
 }
@@ -17,7 +14,7 @@ class _NetworkImageBGState extends State<NetworkImageBG> {
   GlobalKey imageKey = GlobalKey();
   GlobalKey paintKey = GlobalKey();
 
-  GlobalKey currentKey;
+  late GlobalKey currentKey;
 
   final StreamController<Color> stateController = StreamController<Color>();
   Color color1 = Color(0xFFFFFFFF);
@@ -26,7 +23,7 @@ class _NetworkImageBGState extends State<NetworkImageBG> {
   void initState() {
     currentKey = paintKey;
     Timer.periodic(Duration(seconds: 1), (callback) async {
-      if (imageKey.currentState.context.size.height == 0.0) {
+      if (imageKey.currentState == null || imageKey.currentState!.context.size == null || imageKey.currentState!.context.size!.height == 0.0) {
       } else {
         var cd1 = await ColorDetection(
           currentKey: currentKey,

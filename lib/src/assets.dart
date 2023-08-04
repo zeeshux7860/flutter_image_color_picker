@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'dart:async';
-
-import 'package:flutter/rendering.dart';
 import 'package:image_color_picker/src/color.dart';
 
 class AssetImageBG extends StatefulWidget {
